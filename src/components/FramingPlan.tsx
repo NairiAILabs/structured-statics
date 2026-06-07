@@ -38,15 +38,15 @@ export function FramingPlan({
           <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Framing plan with verification status">
             {/* grid frame */}
             <rect x={PAD} y={PAD} width={PLAN_EXTENT.w * SCALE} height={PLAN_EXTENT.h * SCALE}
-              fill="none" stroke="#1c261f" strokeWidth={1} strokeDasharray="2 5" />
+              fill="none" stroke="#cfdac9" strokeWidth={1} strokeDasharray="2 5" />
             {/* gridlines */}
             {[0, 6.5, 12, 20].map((x) => (
               <line key={`gx${x}`} x1={mx(x)} y1={PAD - 14} x2={mx(x)} y2={H - PAD + 14}
-                stroke="#16201a" strokeWidth={1} />
+                stroke="#e0e7db" strokeWidth={1} />
             ))}
             {[0, 5.5, 11].map((y) => (
               <line key={`gy${y}`} x1={PAD - 14} y1={my(y)} x2={W - PAD + 14} y2={my(y)}
-                stroke="#16201a" strokeWidth={1} />
+                stroke="#e0e7db" strokeWidth={1} />
             ))}
 
             {/* members */}
@@ -68,7 +68,7 @@ export function FramingPlan({
                         strokeWidth={16} strokeLinecap="round" opacity={0.18} />
                     )}
                     <rect x={cx - 17} y={cy - 9} width={34} height={18} rx={4}
-                      fill="#0a0f0c" stroke={color} strokeWidth={1} opacity={0.95} />
+                      fill="#ffffff" stroke={color} strokeWidth={1} opacity={0.98} />
                     <text x={cx} y={cy + 4} fontSize={10.5} fontFamily="monospace"
                       fill={color} textAnchor="middle">{r.input.id}</text>
                   </g>
@@ -81,7 +81,7 @@ export function FramingPlan({
                   <g key={r.input.id} style={{ cursor: "pointer" }} onClick={() => onSelect(r.input.id)}>
                     {active && <rect x={x - 14} y={y - 14} width={28} height={28} rx={4} fill={color} opacity={0.18} />}
                     <rect x={x - 9} y={y - 9} width={18} height={18} rx={3}
-                      fill={color} stroke="#0a0f0c" strokeWidth={2} />
+                      fill={color} stroke="#ffffff" strokeWidth={2} />
                     <text x={x + 14} y={y - 12} fontSize={10.5} fontFamily="monospace"
                       fill={color} textAnchor="start">{r.input.id}</text>
                   </g>
