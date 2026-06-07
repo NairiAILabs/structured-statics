@@ -6,6 +6,7 @@
 
 ![status: proof of concept](https://img.shields.io/badge/status-proof%20of%20concept-c5d9c0)
 ![code: EN 1993-1-1](https://img.shields.io/badge/code-EN%201993--1--1-9aa89e)
+![code: AISC 360](https://img.shields.io/badge/code-AISC%20360-586059)
 
 ---
 
@@ -29,25 +30,11 @@ already extracts (IDs, sections, grades, spans, loads) and runs real Eurocode 3
 checks, returning the same *"exact location / what's wrong / how to fix"* contract
 Structured ships — but for the mechanics.
 
-## What it does
-
-For each member it runs **EN 1993-1-1** checks and reports a full audit trail:
-
-| Member type | Checks |
+| Member type | Checks (EC3 & AISC 360) |
 |---|---|
-| **Beam** | Cross-section classification · bending (§6.2.5) · shear (§6.2.6) · deflection SLS (§7.2, L/250) |
-| **Column** | Cross-section classification · flexural buckling, both axes (§6.3.1) |
-
-Each check returns demand (Ed), resistance (Rd), the **exact clause**, the
-**formula actually evaluated**, the **utilization**, and pass/fail. The governing
-check drives a per-member status:
-
-- **FAIL** — utilization > 1.0 (unsafe) → suggests the lightest adequate section.
-- **OVER** — a section ≥15% lighter still passes → flags recoverable steel/cost/CO₂.
-- **PASS** — correctly engineered.
-
-Section properties are **real EN 10365 catalogue values** (IPE + HEA), so the
-numbers are genuine, not illustrative.
+| **Beam** | Bending, shear, deflection (SLS), and Lateral-Torsional Buckling (LTB). |
+| **Column** | Flexural buckling (both axes). |
+| **Beam-Column** | Combined axial + bending interaction. |
 
 ## Why it's a true add-on, not a separate tool
 
@@ -79,6 +66,8 @@ npm run dev      # http://localhost:5176
 ```
 
 ## Use it with a real schedule
+
+> **Production Note:** In a real deployment, Statics does not use files. It is an API layer that consumes the structured JSON schema directly from the upstream extraction model in-memory. The CSV/JSON upload interface is provided strictly as a standalone demo adapter.
 
 The landing demo is a fixed sample sheet, but the tool runs on **any** member
 schedule. Use the input bar at the top:
@@ -126,20 +115,17 @@ src/
 The engine is framework-free and fully testable in isolation — the UI is just a
 view over it.
 
-## Honest scope & next steps
+## Scope & Production Boundaries
 
-This is a focused proof of concept, with assumptions stated in the UI:
+This is a proof-of-concept for the *integration architecture* between AI extraction and deterministic physics, not a replacement for full-suite solvers like Tekla or ETABS. 
 
-- Simply-supported beams under uniform load; columns in pure compression.
-- Lateral-torsional buckling and combined axial+bending interaction are the
-  immediate next checks.
-- A pluggable **AISC / ACI** code module (US market) is a configuration layer on
-  top of the same engine — the check logic is code-agnostic by design.
-- Real integration would read load takedowns and restraint conditions from the
-  model rather than the schedule.
+To isolate the AI-to-Physics bridge, the engine enforces strict boundaries:
+- **Assumed Geometry:** Evaluates simply-supported spans and pure compression/interaction based on extracted system lengths.
+- **Hardcoded Base Factors:** Uses base code parameters (e.g., EC3 $\gamma_{M0} = 1.0$, AISC basic LRFD 1.2D+1.6L). 
+- **Upstreamed Complexity:** It deliberately does not calculate regional National Annexes, fire design, or complex consequence classes. In production, these parameters would be injected into the payload during an upstream load-takedown stage before hitting this verification layer.
+
+The goal is to prove that if the AI accurately structures the data, a pluggable deterministic module (EC3/AISC) can instantly generate a fully auditable safety trace.
 
 ---
 
-Built by a civil-engineering student (Centrale Lyon ENISE) as the "physics"
-complement to symbolic drawing QA. Not affiliated with Structured AI; the logo
-is used only to illustrate the integration concept.
+Built by a civil-engineering student (Centrale Lyon ENISE) as the "physics" complement to symbolic drawing QA. Not affiliated with Structured AI; the logo is used only to illustrate the integration concept.
