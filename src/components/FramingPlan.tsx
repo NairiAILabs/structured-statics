@@ -1,20 +1,13 @@
-import { PLAN_EXTENT } from "../engine/sampleProject";
+import { planExtent } from "../engine/layout";
 import type { MemberResult, Status } from "../engine/types";
 
 const COLOR: Record<Status, string> = {
-  FAIL: "#ff5d5d",
-  OVER: "#f0b44a",
-  PASS: "#5fcf86",
+  FAIL: "#ce3b3b",
+  OVER: "#b9821a",
+  PASS: "#2e8b50",
 };
 
-// SVG coordinate mapping: metres → px
 const PAD = 46;
-const SCALE = 30; // px per metre
-const W = PLAN_EXTENT.w * SCALE + PAD * 2;
-const H = PLAN_EXTENT.h * SCALE + PAD * 2;
-
-function mx(x: number) { return PAD + x * SCALE; }
-function my(y: number) { return PAD + (PLAN_EXTENT.h - y) * SCALE; }
 
 export function FramingPlan({
   results,
@@ -25,6 +18,18 @@ export function FramingPlan({
   activeId: string;
   onSelect: (id: string) => void;
 }) {
+  const extent = planExtent(results.map((r) => r.input));
+  // px per metre — shrink for large schedules so the diagram fits
+  const SCALE = Math.max(12, Math.min(30, 560 / Math.max(extent.w, extent.h)));
+  const W = extent.w * SCALE + PAD * 2;
+  const H = extent.h * SCALE + PAD * 2;
+  const mx = (x: number) => PAD + x * SCALE;
+  const my = (y: number) => PAD + (extent.h - y) * SCALE;
+
+  // gridlines: sample data uses fixed grid; otherwise none
+  const xLines = [0, extent.w - 1];
+  const yLines = [0, extent.h - 1];
+
   return (
     <div className="card">
       <div className="card-hd">
@@ -37,14 +42,14 @@ export function FramingPlan({
         <div className="plan">
           <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Framing plan with verification status">
             {/* grid frame */}
-            <rect x={PAD} y={PAD} width={PLAN_EXTENT.w * SCALE} height={PLAN_EXTENT.h * SCALE}
+            <rect x={PAD} y={PAD} width={extent.w * SCALE} height={extent.h * SCALE}
               fill="none" stroke="#cfdac9" strokeWidth={1} strokeDasharray="2 5" />
-            {/* gridlines */}
-            {[0, 6.5, 12, 20].map((x) => (
+            {/* boundary gridlines */}
+            {xLines.map((x) => (
               <line key={`gx${x}`} x1={mx(x)} y1={PAD - 14} x2={mx(x)} y2={H - PAD + 14}
                 stroke="#e0e7db" strokeWidth={1} />
             ))}
-            {[0, 5.5, 11].map((y) => (
+            {yLines.map((y) => (
               <line key={`gy${y}`} x1={PAD - 14} y1={my(y)} x2={W - PAD + 14} y2={my(y)}
                 stroke="#e0e7db" strokeWidth={1} />
             ))}
@@ -53,7 +58,7 @@ export function FramingPlan({
             {results.map((r) => {
               const color = COLOR[r.status];
               const active = r.input.id === activeId;
-              if (r.input.kind === "beam" && "x1" in r.input.plan) {
+              if (r.input.kind === "beam" && r.input.plan && "x1" in r.input.plan) {
                 const p = r.input.plan;
                 const x1 = mx(p.x1), y1 = my(p.y1), x2 = mx(p.x2), y2 = my(p.y2);
                 const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
@@ -74,7 +79,7 @@ export function FramingPlan({
                   </g>
                 );
               }
-              if ((r.input.kind === "column" || r.input.kind === "beam-column") && "x" in r.input.plan) {
+              if ((r.input.kind === "column" || r.input.kind === "beam-column") && r.input.plan && "x" in r.input.plan) {
                 const p = r.input.plan;
                 const x = mx(p.x), y = my(p.y);
                 return (

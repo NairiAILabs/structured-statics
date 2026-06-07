@@ -78,6 +78,36 @@ npm install
 npm run dev      # http://localhost:5176
 ```
 
+## Use it with a real schedule
+
+The landing demo is a fixed sample sheet, but the tool runs on **any** member
+schedule. Use the input bar at the top:
+
+- **Upload schedule** — a `.csv` / `.json` file.
+- **Paste from Excel** — copy rows straight out of a spreadsheet (tab-separated)
+  and paste them in.
+- **Download template** — a starter CSV with the exact columns.
+
+Columns (header row required; blanks allowed where not applicable):
+
+```
+id,kind,section,grade,L,gk,qk,NEd,MyEd,restrained,note
+B-101,beam,IPE 300,S235,7.0,8,12,,,true,Primary floor beam
+RB-1,beam,IPE 360,S235,6.5,10,14,,,false,Unrestrained roof beam
+C-101,column,HEA 200,S235,3.5,,,850,,,Internal column
+C-102,beam-column,HEA 240,S235,4.0,,,700,90,,Perimeter column + moment
+```
+
+`kind` ∈ {`beam`, `column`, `beam-column`}; `L` in m; `gk`/`qk` in kN/m;
+`NEd` in kN; `MyEd` in kNm; `restrained` true/false (beams). Sections are
+validated against the catalogue and unknown ones are flagged. No drawing
+geometry is needed — the verification diagram is generated automatically.
+
+**Where this fits the pipeline:** this schedule is exactly what an extraction
+tool (e.g. Structured AI's vision model / Revit add-in) produces from a drawing.
+Statics is the verification stage that consumes it — it deliberately does *not*
+re-do extraction.
+
 ## Architecture
 
 ```

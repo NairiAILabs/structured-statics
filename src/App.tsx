@@ -4,15 +4,32 @@ import { FramingPlan } from "./components/FramingPlan";
 import { MemberTable } from "./components/MemberTable";
 import { MemberDetail } from "./components/MemberDetail";
 import { SummaryStats, DeterminismCallout, ImpactPanel } from "./components/Panels";
-import { SAMPLE_MEMBERS } from "./engine/sampleProject";
+import { DataBar } from "./components/DataBar";
+import { autoLayout } from "./engine/layout";
+import { SAMPLE_MEMBERS, SHEET } from "./engine/sampleProject";
 import { projectImpact, verifyProject } from "./engine/verify";
 import type { CodeName, MemberInput } from "./engine/types";
+
+const DEMO_SOURCE = `${SHEET} · demo`;
 
 export default function App() {
   // members are mutable so the detail panel can re-verify live
   const [members, setMembers] = useState<MemberInput[]>(SAMPLE_MEMBERS);
   const [activeId, setActiveId] = useState<string>("B-04");
   const [code, setCode] = useState<CodeName>("EC3");
+  const [source, setSource] = useState<string>(DEMO_SOURCE);
+
+  function loadMembers(ms: MemberInput[], label: string) {
+    const laid = autoLayout(ms);
+    setMembers(laid);
+    setSource(label);
+    setActiveId(laid[0]?.id ?? "");
+  }
+  function resetDemo() {
+    setMembers(SAMPLE_MEMBERS);
+    setSource(DEMO_SOURCE);
+    setActiveId("B-04");
+  }
 
   const results = useMemo(() => verifyProject(members, code), [members, code]);
   const impact = useMemo(() => projectImpact(results), [results]);
@@ -37,6 +54,8 @@ export default function App() {
   return (
     <div className="app">
       <Header code={code} onCode={setCode} />
+
+      <DataBar source={source} count={members.length} onLoad={loadMembers} onReset={resetDemo} />
 
       {code === "AISC" && (
         <div className="codebanner">

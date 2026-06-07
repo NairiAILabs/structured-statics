@@ -46,8 +46,9 @@ export interface MemberInput {
   // Beam lateral restraint. If false, lateral-torsional buckling is checked
   // over the full span. Floor beams with a slab/deck on top are restrained.
   restrained?: boolean;
-  // Plan geometry for the framing-plan overlay (normalised grid coords)
-  plan: { x1: number; y1: number; x2: number; y2: number } | { x: number; y: number };
+  // Plan geometry for the framing-plan overlay (grid coords, metres). Optional —
+  // uploaded schedules have no drawing geometry, so it is auto-generated.
+  plan?: { x1: number; y1: number; x2: number; y2: number } | { x: number; y: number };
   note?: string;
 }
 
