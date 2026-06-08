@@ -1,7 +1,7 @@
 # Statics — a deterministic structural-verification layer for Structured AI
 
 > A proof-of-concept QA/QC check that sits **on top of** Structured AI's drawing
-> extraction and answers the one question their pipeline can't: *is this member
+> extraction and answers the one question their pipeline potentially can't at this time: *is this member
 > actually adequate for the load it carries?*
 
 ![status: proof of concept](https://img.shields.io/badge/status-proof%20of%20concept-c5d9c0)
@@ -14,8 +14,7 @@
 
 Structured AI reads drawings and documents and checks them **symbolically**:
 Is the schedule consistent? Does the annotation match the code *text*? Do the
-trades clash geometrically? That's hard, valuable work — and it's everything
-their current product does.
+trades clash geometrically? That's hard, valuable work — and their current product does that.
 
 What no LLM / vision model should be trusted to do is the **physics**: evaluate
 whether a beam passes in bending, whether a column buckles, whether deflection
